@@ -71,19 +71,36 @@ def experiment():
         env.render(Q_sa=QIagent.Q_sa,plot_optimal_policy=True,step_pause=0.5)
         s = s_next
 
-    # Compute mean reward per timestep under the optimal policy
-    total_reward = 0
-    total_steps = 0
-    done = False
-    s = env.reset()
-    while not done:
-        a = QIagent.select_action(s)
-        s_next, r, done = env.step(a)
-        total_reward += r
-        total_steps += 1
-        s = s_next
-    mean_reward_per_timestep = total_reward / total_steps
-    print(f"Mean reward per timestep under optimal policy: {mean_reward_per_timestep}")
-    
+    # Optimal start-state value V*(s_start) from the converged Q-table
+    s_start = env.reset()
+    V_start = np.max(QIagent.Q_sa[s_start])
+    print(f"\nOptimal start-state value V*(s_start): {V_start}")
+
+    # Average episode return over more episodes
+    n_eval_episodes = 100
+    episode_returns = []
+    episode_lengths = []
+    for _ in range(n_eval_episodes):
+        total_reward = 0
+        total_steps = 0
+        done = False
+        s = env.reset()
+        while not done:
+            a = QIagent.select_action(s)
+            s_next, r, done = env.step(a)
+            total_reward += r
+            total_steps += 1
+            s = s_next
+        episode_returns.append(total_reward)
+        episode_lengths.append(total_steps)
+
+    mean_episode_return = np.mean(episode_returns)
+    mean_steps = np.mean(episode_lengths)
+    mean_reward_per_step = np.mean([r / l for r, l in zip(episode_returns, episode_lengths)])
+
+    print(f"Results over {n_eval_episodes} episodes under optimal policy:")
+    print(f"Mean episode return: {mean_episode_return}")
+    print(f"Mean episode length: {mean_steps}")
+    print(f"Mean reward per timestep: {mean_reward_per_step}")
 if __name__ == '__main__':
     experiment()
