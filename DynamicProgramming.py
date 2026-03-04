@@ -71,19 +71,9 @@ def experiment():
         env.render(Q_sa=QIagent.Q_sa,plot_optimal_policy=True,step_pause=0.5)
         s = s_next
 
-    # Compute mean reward per timestep under the optimal policy
-    total_reward = 0
-    total_steps = 0
-    done = False
-    s = env.reset()
-    while not done:
-        a = QIagent.select_action(s)
-        s_next, r, done = env.step(a)
-        total_reward += r
-        total_steps += 1
-        s = s_next
-    mean_reward_per_timestep = total_reward / total_steps
-    print(f"Mean reward per timestep under optimal policy: {mean_reward_per_timestep}")
-    
+    # Optimal start-state value V*(s_start) from the converged Q-table
+    s_start = env.reset()
+    V_start = np.max(QIagent.Q_sa[s_start])
+    print(f"\nOptimal start-state value V*(s_start): {V_start}")
 if __name__ == '__main__':
     experiment()
