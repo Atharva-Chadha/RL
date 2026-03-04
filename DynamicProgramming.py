@@ -34,7 +34,7 @@ def Q_value_iteration(env, gamma=1.0, threshold=0.001):
     
     QIagent = QValueIterationAgent(env.n_states, env.n_actions, gamma)
 
-    # TO DO: IMPLEMENT Q-VALUE ITERATION HERE
+    # IMPLEMENTATION OF Q-VALUE ITERATION
     i = 0
     while True:
         max_error = 0
@@ -71,7 +71,7 @@ def experiment():
         env.render(Q_sa=QIagent.Q_sa,plot_optimal_policy=True,step_pause=0.5)
         s = s_next
 
-    # TO DO: Compute mean reward per timestep under the optimal policy
+    # Compute mean reward per timestep under the optimal policy
     total_reward = 0
     total_steps = 0
     done = False
