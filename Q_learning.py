@@ -9,12 +9,16 @@ By Thomas Moerland
 import numpy as np
 from Environment import StochasticWindyGridworld
 from Agent import BaseAgent
+from Helper import linear_anneal
 
 class QLearningAgent(BaseAgent):
         
     def update(self,s,a,r,s_next,done):
-        # TO DO: Add own code
-        pass
+        if done:
+            target = r
+        else:
+            target = r + self.gamma * np.max(self.Q_sa[s_next])
+        self.Q_sa[s, a] += self.learning_rate * (target - self.Q_sa[s, a])
 
 def q_learning(n_timesteps, learning_rate, gamma, policy='egreedy', epsilon=None, temp=None, plot=True, eval_interval=500):
     ''' runs a single repetition of q_learning
@@ -26,11 +30,28 @@ def q_learning(n_timesteps, learning_rate, gamma, policy='egreedy', epsilon=None
     eval_timesteps = []
     eval_returns = []
     
-    # TO DO: Write your Q-learning algorithm here!
-    
-    # if plot:
-    #    env.render(Q_sa=pi.Q_sa,plot_optimal_policy=True,step_pause=0.1) # Plot the Q-value estimates during Q-learning execution
+    s = env.reset()
+    for t in range(n_timesteps):
+        if t % eval_interval == 0:
+            eval_returns.append(agent.evaluate(eval_env))
+            eval_timesteps.append(t)
+        
+        # Anneal epsilon for exploration-exploitation tradeoff
+        if policy == 'egreedy' and epsilon is not None:
+            epsilon_t = linear_anneal(t, n_timesteps, epsilon, 0.01, 0.75)
+        else:
+            epsilon_t = epsilon
+        a = agent.select_action(s, policy, epsilon_t, temp)
+        s_next, r, done = env.step(a)
+        agent.update(s, a, r, s_next, done)
+        
+        if done:
+            s = env.reset()
+        else:
+            s = s_next
 
+    if plot:
+        env.render(Q_sa=agent.Q_sa,plot_optimal_policy=True,step_pause=0.1)
 
     return np.array(eval_returns), np.array(eval_timesteps)   
 

@@ -34,7 +34,6 @@ def Q_value_iteration(env, gamma=1.0, threshold=0.001):
     
     QIagent = QValueIterationAgent(env.n_states, env.n_actions, gamma)
 
-    # IMPLEMENTATION OF Q-VALUE ITERATION
     i = 0
     while True:
         max_error = 0
@@ -45,11 +44,7 @@ def Q_value_iteration(env, gamma=1.0, threshold=0.001):
                 QIagent.update(s, a, p_sas, r_sas)
                 max_error = max(max_error, abs(QIagent.Q_sa[s, a] - q_old))
         i += 1
-
-        # Plot current Q-value estimates & print max error
-        env.render(Q_sa=QIagent.Q_sa, plot_optimal_policy=True, step_pause=0.2)
         print("Q-value iteration, iteration {}, max error {}".format(i, max_error))
-
         if max_error < threshold:
             break
  
@@ -71,12 +66,12 @@ def experiment():
         env.render(Q_sa=QIagent.Q_sa,plot_optimal_policy=True,step_pause=0.5)
         s = s_next
 
-    # Optimal start-state value V*(s_start) from the converged Q-table
+    # Optimal start-state value
     s_start = env.reset()
     V_start = np.max(QIagent.Q_sa[s_start])
     print(f"\nOptimal start-state value V*(s_start): {V_start}")
 
-    # Average episode return over more episodes
+    # Compute mean reward per timestep under the optimal policy
     n_eval_episodes = 100
     episode_returns = []
     episode_lengths = []
@@ -96,11 +91,11 @@ def experiment():
 
     mean_episode_return = np.mean(episode_returns)
     mean_steps = np.mean(episode_lengths)
-    mean_reward_per_step = np.mean([r / l for r, l in zip(episode_returns, episode_lengths)])
-
-    print(f"Results over {n_eval_episodes} episodes under optimal policy:")
+    mean_reward_per_step = np.mean([ret / l for ret, l in zip(episode_returns, episode_lengths)])
+    print(f"\nResults over {n_eval_episodes} episodes under optimal policy:")
     print(f"Mean episode return: {mean_episode_return}")
     print(f"Mean episode length: {mean_steps}")
     print(f"Mean reward per timestep: {mean_reward_per_step}")
+    
 if __name__ == '__main__':
     experiment()
