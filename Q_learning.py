@@ -9,6 +9,7 @@ By Thomas Moerland
 import numpy as np
 from Environment import StochasticWindyGridworld
 from Agent import BaseAgent
+from Helper import linear_anneal
 
 class QLearningAgent(BaseAgent):
         
@@ -67,6 +68,8 @@ def q_learning(n_timesteps, learning_rate, gamma, policy='egreedy', epsilon=None
     # if plot:
     #    env.render(Q_sa=pi.Q_sa,plot_optimal_policy=True,step_pause=0.1) # Plot the Q-value estimates during Q-learning execution
 
+    if plot:
+        env.render(Q_sa=agent.Q_sa,plot_optimal_policy=True,step_pause=0.1)
 
 
 def test():
