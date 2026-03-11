@@ -8,7 +8,6 @@ By Thomas Moerland
 
 import numpy as np
 import time
-import os
 
 from Q_learning import q_learning
 from SARSA import sarsa
@@ -75,15 +74,14 @@ def experiment():
     
     #### Assignment 1: Dynamic Programming
     # Execute this assignment in DynamicProgramming.py
-    optimal_episode_return = 83.67825468739042 # V*(s_start) from DP assignment
+    optimal_episode_return = 83.67825468739042 # set the optimal return per episode you found in the DP assignment here
     
     #### Assignment 2: Effect of exploration
     policy = 'egreedy'
     epsilons = [0.03,0.1,0.3]
     learning_rate = 0.1
     backup = 'q'
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    Plot = LearningCurvePlot(title = r'Exploration: $\epsilon$-greedy versus softmax exploration')    
+    Plot = LearningCurvePlot(title = 'Exploration: $\epsilon$-greedy versus softmax exploration')    
     Plot.set_ylim(-100, 100) 
     for epsilon in epsilons:        
         learning_curve, timesteps = average_over_repetitions(backup, n_repetitions, n_timesteps, max_episode_length, learning_rate, 
@@ -96,7 +94,7 @@ def experiment():
                                               gamma, policy, epsilon, temp, smoothing_window, plot, n, eval_interval)
         Plot.add_curve(timesteps,learning_curve,label=r'softmax, $ \tau $ = {}'.format(temp))
     Plot.add_hline(optimal_episode_return, label="DP optimum")
-    Plot.save(os.path.join(script_dir, 'exploration.png'))
+    Plot.save('exploration.png')
         
     ###### Assignment 3: Q-learning versus SARSA
     policy = 'egreedy'
@@ -111,7 +109,7 @@ def experiment():
                                               gamma, policy, epsilon, temp, smoothing_window, plot, n, eval_interval)
             Plot.add_curve(timesteps,learning_curve,label=r'{}, $\alpha$ = {} '.format(backup_labels[backup],learning_rate))
     Plot.add_hline(optimal_episode_return, label="DP optimum")
-    Plot.save(os.path.join(script_dir, 'on_off_policy.png'))
+    Plot.save('on_off_policy.png')
     
     # ##### Assignment 4: Back-up depth
     policy = 'egreedy'
@@ -130,7 +128,7 @@ def experiment():
                                           gamma, policy, epsilon, temp, smoothing_window, plot, n, eval_interval)
     Plot.add_curve(timesteps,learning_curve,label='Monte Carlo')        
     Plot.add_hline(optimal_episode_return, label="DP optimum")
-    Plot.save(os.path.join(script_dir, 'depth.png'))
+    Plot.save('depth.png')
 
 if __name__ == '__main__':
     experiment()

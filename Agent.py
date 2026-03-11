@@ -21,27 +21,37 @@ class BaseAgent:
     def select_action(self, s, policy='egreedy', epsilon=None, temp=None):
         
         if policy == 'greedy':
-            a = argmax(self.Q_sa[s])
+            # TO DO: Add own code
+            #a = np.random.randint(0,self.n_actions) # Replace this with correct action selection
             
+            a = argmax(self.Q_sa[s]) #greedy action selection 
+
         elif policy == 'egreedy':
             if epsilon is None:
                 raise KeyError("Provide an epsilon")
-            
-            if np.random.random() < epsilon:
-                a = np.random.randint(0, self.n_actions)
-            else:
-                a = argmax(self.Q_sa[s])
-                 
+                
+            # TO DO: Add own code
+            #a = np.random.randint(0,self.n_actions) # Replace this with correct action selection
+ 
+
+            if np.random.rand()< epsilon: #FIXXX 
+                a = np.random.randint(0,self.n_actions)
+            else: 
+                a=argmax(self.Q_sa[s]) #choose the greedy action 
+
+
         elif policy == 'softmax':
             if temp is None:
                 raise KeyError("Provide a temperature")
+                
+            # TO DO: Add own code
+            #a = np.random.randint(0,self.n_actions) # Replace this with correct action selection
             
-            probs = softmax(self.Q_sa[s], temp)
-            a = np.random.choice(self.n_actions, p=probs)
-        
-        else:
-            raise ValueError("Unknown policy '{}'. Use 'greedy', 'egreedy', or 'softmax'.".format(policy))
-              
+            prob_softm = softmax(self.Q_sa[s], temp) #compute the softmax probabilities for each action
+            a = np.random.choice(self.n_actions, p=prob_softm) #softmax action selection
+            
+
+            
         return a
         
     def update(self):

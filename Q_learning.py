@@ -9,16 +9,21 @@ By Thomas Moerland
 import numpy as np
 from Environment import StochasticWindyGridworld
 from Agent import BaseAgent
-from Helper import linear_anneal
 
 class QLearningAgent(BaseAgent):
         
     def update(self,s,a,r,s_next,done):
-        if done:
-            target = r
+        # TO DO: Add own code
+        #pass
+        if done: 
+            target= r
         else:
-            target = r + self.gamma * np.max(self.Q_sa[s_next])
-        self.Q_sa[s, a] += self.learning_rate * (target - self.Q_sa[s, a])
+            max_next_q = np.max(self.Q_sa[s_next] )
+            target = r + self.gamma *max_next_q
+
+        old_value = self.Q_sa[s, a]
+        self.Q_sa[s,a] = old_value +self.learning_rate *(target-old_value)
+        
 
 def q_learning(n_timesteps, learning_rate, gamma, policy='egreedy', epsilon=None, temp=None, plot=True, eval_interval=500):
     ''' runs a single repetition of q_learning
@@ -30,35 +35,44 @@ def q_learning(n_timesteps, learning_rate, gamma, policy='egreedy', epsilon=None
     eval_timesteps = []
     eval_returns = []
     
-    s = env.reset()
-    for t in range(n_timesteps):
-        if t % eval_interval == 0:
-            eval_returns.append(agent.evaluate(eval_env))
-            eval_timesteps.append(t)
-        
-        # Anneal epsilon for exploration-exploitation tradeoff
-        if policy == 'egreedy' and epsilon is not None:
-            epsilon_t = linear_anneal(t, n_timesteps, epsilon, 0.01, 0.75)
-        else:
-            epsilon_t = epsilon
-        a = agent.select_action(s, policy, epsilon_t, temp)
-        s_next, r, done = env.step(a)
-        agent.update(s, a, r, s_next, done)
-        
+    # TO DO: Write your Q-learning algorithm here!
+    
+
+    current_state= env.reset() #initialize enviromnment &gets initial state
+
+    for step in range(n_timesteps) :
+
+        chosen_action = agent.select_action(current_state, policy, epsilon, temp)
+
+        #simulate 1 step
+        next_state, reward, done = env.step(chosen_action)
+
+        #update qvalies
+        agent.update(current_state, chosen_action, reward, next_state, done)
+
+        #resets if done,,else conintues
         if done:
-            s = env.reset()
+            #print("reached thegoal at training step number", step + 1)
+            current_state=env.reset()
         else:
-            s = s_next
 
-    if plot:
-        env.render(Q_sa=agent.Q_sa,plot_optimal_policy=True,step_pause=0.1)
+            current_state= next_state
 
-    return np.array(eval_returns), np.array(eval_timesteps)   
+        #evaluate for every eval_interval steps
+        if (step+1) %eval_interval== 0:
+            eval_timesteps.append(step+1)
+            eval_returns.append( agent.evaluate(eval_env) )
+    
+    return np.array(eval_returns),np.array(eval_timesteps)
+    # if plot:
+    #    env.render(Q_sa=pi.Q_sa,plot_optimal_policy=True,step_pause=0.1) # Plot the Q-value estimates during Q-learning execution
+
+
 
 def test():
     
-    n_timesteps = 1000
-    eval_interval=100
+    n_timesteps = 10000
+    eval_interval=1000
     gamma = 1.0
     learning_rate = 0.1
 
